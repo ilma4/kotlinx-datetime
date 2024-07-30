@@ -16,9 +16,9 @@ import kotlin.test.assertEquals
 import kotlin.time.toJavaDuration
 import kotlin.time.toKotlinDuration
 
-class Hz {
+class DiffTest {
     class datePeriodDiff {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun diff(data: FuzzedDataProvider) {
             val mod = 0 //5000
             val a = data.consumeDate(-mod, mod)
@@ -68,7 +68,7 @@ class Hz {
     }
 
     class instantDiff {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun diff(data: FuzzedDataProvider) = with(data) {
             val kfirst = consumeInstant()
             val ksecond = consumeInstant()
@@ -88,7 +88,7 @@ class Hz {
     }
 
     class instantTZDiff {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun diff(data: FuzzedDataProvider) = with(data) {
             val kfirst = consumeInstant()
             val ksecond = consumeInstant()
@@ -112,7 +112,7 @@ class Hz {
     }
 
     class InstantToDateTimeAndBack {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun test(data: FuzzedDataProvider) = with(data) {
             val d = consumeDateTime()
             val tz = consumeTimeZone()
@@ -126,7 +126,7 @@ class Hz {
     }
 
     class CompareDurations {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun test(data: FuzzedDataProvider) = with(data) {
             val first = consumeInstant(nanoFrom = 0, nanoTo = 0)
             val second = consumeInstant(nanoFrom = 0, nanoTo = 0)

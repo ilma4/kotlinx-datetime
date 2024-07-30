@@ -12,7 +12,7 @@ import kotlinx.datetime.*
 
 class ParseFromInt {
     class instant {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun instant(data: FuzzedDataProvider) {
             val milliseconds = data.consumeLong()
             compareTest(
@@ -26,7 +26,7 @@ class ParseFromInt {
     }
 
     class instantFromSeconds {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun instantFromSeconds(data: FuzzedDataProvider) {
             val seconds = data.consumeLong(Long.MIN_VALUE / 1000L, Long.MAX_VALUE / 1000L)
             val nanos = data.consumeLong()
@@ -41,11 +41,11 @@ class ParseFromInt {
     }
 
     class localDate {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun localDate(data: FuzzedDataProvider) {
             val epochDay = data.consumeInt()
             compareTest(
-                createKotlin = { LocalDate.fromEpochDays(epochDay.toInt()) },
+                createKotlin = { LocalDate.fromEpochDays(epochDay) },
                 createJava = { java.time.LocalDate.ofEpochDay(epochDay.toLong()) },
                 javaToKotlin = { it.toKotlinLocalDate() },
                 kotlinToJava = { it.toJavaLocalDate() },

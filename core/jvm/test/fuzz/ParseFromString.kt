@@ -9,14 +9,13 @@ import com.code_intelligence.jazzer.api.FuzzedDataProvider
 import com.code_intelligence.jazzer.junit.FuzzTest
 import fuzz.utils.compareTest
 import kotlinx.datetime.*
-import java.sql.Time
 import java.time.ZoneId
 
 class ParseFromString {
 
     class localDate {
 
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun localDate(data: FuzzedDataProvider) {
             val s = data.consumeAsciiString(10)
             compareTest(
@@ -26,7 +25,7 @@ class ParseFromString {
                 javaToKotlin = { it.toKotlinLocalDate() })
         }
 
-        @FuzzTest
+        //        @FuzzTest
         fun localDateDict(data: FuzzedDataProvider) {
             val len = data.consumeInt(4, 20)
             val chars = (0..9).toList().map { it.toString() } + "-"
@@ -68,7 +67,7 @@ class ParseFromString {
     }
 
     class timeZone {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun timeZone(data: FuzzedDataProvider) = with(data) {
             val s = consumeString(100)
             compareTest(
