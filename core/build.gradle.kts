@@ -37,55 +37,55 @@ java {
 kotlin {
     explicitApi()
 
-    infra {
-        common("tzfile") {
-            // Tiers are in accordance with <https://kotlinlang.org/docs/native-target-support.html>
-            common("tzdbOnFilesystem") {
-                common("linux") {
-                    // Tier 1
-                    target("linuxX64")
-                    // Tier 2
-                    target("linuxArm64")
-                    // Tier 4 (deprecated, but still in demand)
-                    target("linuxArm32Hfp")
+    /*    infra {
+            common("tzfile") {
+                // Tiers are in accordance with <https://kotlinlang.org/docs/native-target-support.html>
+                common("tzdbOnFilesystem") {
+                    common("linux") {
+                        // Tier 1
+                        target("linuxX64")
+                        // Tier 2
+                        target("linuxArm64")
+                        // Tier 4 (deprecated, but still in demand)
+                        target("linuxArm32Hfp")
+                    }
+                    common("darwin") {
+                        common("darwinDevices") {
+                            // Tier 1
+                            target("macosX64")
+                            target("macosArm64")
+                            // Tier 2
+                            target("watchosX64")
+                            target("watchosArm32")
+                            target("watchosArm64")
+                            target("tvosX64")
+                            target("tvosArm64")
+                            target("iosArm64")
+                            // Tier 3
+                            target("watchosDeviceArm64")
+                        }
+                        common("darwinSimulator") {
+                            // Tier 1
+                            target("iosSimulatorArm64")
+                            target("iosX64")
+                            // Tier 2
+                            target("watchosSimulatorArm64")
+                            target("tvosSimulatorArm64")
+                        }
+                    }
                 }
-                common("darwin") {
-                    common("darwinDevices") {
-                        // Tier 1
-                        target("macosX64")
-                        target("macosArm64")
-                        // Tier 2
-                        target("watchosX64")
-                        target("watchosArm32")
-                        target("watchosArm64")
-                        target("tvosX64")
-                        target("tvosArm64")
-                        target("iosArm64")
-                        // Tier 3
-                        target("watchosDeviceArm64")
-                    }
-                    common("darwinSimulator") {
-                        // Tier 1
-                        target("iosSimulatorArm64")
-                        target("iosX64")
-                        // Tier 2
-                        target("watchosSimulatorArm64")
-                        target("tvosSimulatorArm64")
-                    }
+                common("androidNative") {
+                    target("androidNativeArm32")
+                    target("androidNativeArm64")
+                    target("androidNativeX86")
+                    target("androidNativeX64")
                 }
             }
-            common("androidNative") {
-                target("androidNativeArm32")
-                target("androidNativeArm64")
-                target("androidNativeX86")
-                target("androidNativeX64")
+            // Tier 3
+            common("windows") {
+                target("mingwX64")
             }
-        }
-        // Tier 3
-        common("windows") {
-            target("mingwX64")
-        }
-    }
+        }*/
 
     jvm {
         attributes {
@@ -97,6 +97,7 @@ kotlin {
 
     }
 
+/*
     js {
         nodejs {
             testTask {
@@ -128,6 +129,7 @@ kotlin {
             }
         }
     }
+*/
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
@@ -161,11 +163,11 @@ kotlin {
             }
 
             konanTarget.family == org.jetbrains.kotlin.konan.target.Family.LINUX ||
-                konanTarget.family == org.jetbrains.kotlin.konan.target.Family.ANDROID ||
-                konanTarget.family.isAppleFamily ->
-            {
+                    konanTarget.family == org.jetbrains.kotlin.konan.target.Family.ANDROID ||
+                    konanTarget.family.isAppleFamily -> {
                 // do nothing special
             }
+
             else -> {
                 throw IllegalArgumentException("Unknown native target ${this@withType}")
             }
@@ -188,9 +190,15 @@ kotlin {
         }
 
         val jvmTest by getting {
+            dependencies {
+                implementation("com.code-intelligence:jazzer-api:0.22.1")
+                implementation("com.code-intelligence:jazzer-junit:0.16.1")
+                implementation("org.junit.jupiter:junit-jupiter:5.9.2")
+//                implementation(kotlin("reflect"))
+            }
         }
 
-        val commonJsMain by creating {
+/*        val commonJsMain by creating {
             dependsOn(commonMain.get())
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
@@ -235,12 +243,15 @@ kotlin {
         }
 
         val darwinTest by getting {
-        }
+        }*/
     }
 }
 
 tasks {
     val jvmTest by existing(Test::class) {
+        useJUnitPlatform()
+        testLogging.showStandardStreams = true
+        maxHeapSize = "4096m"
         // maxHeapSize = "1024m"
     }
 
@@ -251,7 +262,11 @@ tasks {
         val targetDir = compileKotlinJvm.destinationDirectory.map { it.dir("../java9/") }
 
         // Use a Java 11 compiler for the module info.
-        javaCompiler.set(project.javaToolchains.compilerFor { languageVersion.set(JavaLanguageVersion.of(modularJavaToolchainVersion)) })
+        javaCompiler.set(project.javaToolchains.compilerFor {
+            languageVersion.set(
+                JavaLanguageVersion.of(modularJavaToolchainVersion)
+            )
+        })
 
         // Always compile kotlin classes before the module descriptor.
         dependsOn(compileKotlinJvm)
@@ -288,7 +303,12 @@ tasks {
         options.compilerArgs.add("-Xlint:-requires-transitive-automatic")
 
         // Patch the compileKotlinJvm output classes into the compilation so exporting packages works correctly.
-        options.compilerArgs.addAll(listOf("--patch-module", "$moduleName=${compileKotlinJvm.destinationDirectory.get()}"))
+        options.compilerArgs.addAll(
+            listOf(
+                "--patch-module",
+                "$moduleName=${compileKotlinJvm.destinationDirectory.get()}"
+            )
+        )
 
         // Use the classpath of the compileKotlinJvm task.
         // Also ensure that the module path is used instead of classpath.
@@ -336,12 +356,20 @@ val downloadWindowsZonesMapping by tasks.registering {
     val output = "$projectDir/windows/src/internal/WindowsZoneNames.kt"
     outputs.file(output)
     doLast {
-        val initialFileContents = try { File(output).readBytes() } catch(e: Throwable) { ByteArray(0) }
+        val initialFileContents = try {
+            File(output).readBytes()
+        } catch (e: Throwable) {
+            ByteArray(0)
+        }
         val documentBuilderFactory = DocumentBuilderFactory.newInstance()
         // otherwise, parsing fails since it can't find the dtd
-        documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+        documentBuilderFactory.setFeature(
+            "http://apache.org/xml/features/nonvalidating/load-external-dtd",
+            false
+        )
         val builder = documentBuilderFactory.newDocumentBuilder()
-        val url = URL("https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/windowsZones.xml")
+        val url =
+            URL("https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/windowsZones.xml")
         val xmlDoc = with(url.openConnection() as java.net.HttpURLConnection) {
             builder.parse(this.inputStream)
         }
@@ -355,7 +383,8 @@ val downloadWindowsZonesMapping by tasks.registering {
             val usualNames = mapZone.attributes.getNamedItem("type").nodeValue
             for (usualName in usualNames.split(' ')) {
                 if (usualName == "") continue
-                val oldWindowsName = mapping[usualName] // don't do it in `put` to preserve the order in the map
+                val oldWindowsName =
+                    mapping[usualName] // don't do it in `put` to preserve the order in the map
                 if (oldWindowsName == null) {
                     mapping[usualName] = windowsName
                 } else if (oldWindowsName != windowsName) {
@@ -388,14 +417,22 @@ val downloadWindowsZonesMapping by tasks.registering {
         val newFileContents = bos.toByteArray()
         if (!(initialFileContents contentEquals newFileContents)) {
             File(output).writeBytes(newFileContents)
-            throw GradleException("The mappings between Windows and IANA timezone names changed. " +
-                "The new mappings were written to the filesystem.")
+            throw GradleException(
+                "The mappings between Windows and IANA timezone names changed. " +
+                        "The new mappings were written to the filesystem."
+            )
         }
     }
 }
 
 tasks.withType<AbstractDokkaLeafTask>().configureEach {
-    pluginsMapConfiguration.set(mapOf("org.jetbrains.dokka.base.DokkaBase" to """{ "templatesDir" : "${projectDir.toString().replace('\\', '/')}/dokka-templates" }"""))
+    pluginsMapConfiguration.set(
+        mapOf(
+            "org.jetbrains.dokka.base.DokkaBase" to """{ "templatesDir" : "${
+                projectDir.toString().replace('\\', '/')
+            }/dokka-templates" }"""
+        )
+    )
 
     failOnWarning.set(true)
     dokkaSourceSets.configureEach {

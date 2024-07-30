@@ -7,11 +7,11 @@ package kotlinx.datetime.format.test
 
 import kotlinx.datetime.*
 import kotlinx.datetime.format.*
+import org.junit.jupiter.api.Test
 import java.text.ParsePosition
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.*
-import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

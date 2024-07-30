@@ -1,7 +1,8 @@
 package kotlinx.datetime
 
 import kotlinx.datetime.format.*
-import kotlin.test.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class InstantParsing {
     @Test
