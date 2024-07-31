@@ -64,7 +64,6 @@ class DiffTest {
 
         assertEquals(kotlinVal, kotlinFromJava)
         assertEquals(javaVal, javaFromKotlin)
-
     }
 
     class instantDiff {

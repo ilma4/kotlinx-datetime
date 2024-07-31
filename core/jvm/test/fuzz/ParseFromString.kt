@@ -37,7 +37,6 @@ class ParseFromString {
                 kotlinToJava = { it.toJavaLocalDate() },
                 javaToKotlin = { it.toKotlinLocalDate() })
         }
-
     }
 
     class localDateTime {
@@ -78,6 +77,4 @@ class ParseFromString {
             )
         }
     }
-
-
 }
