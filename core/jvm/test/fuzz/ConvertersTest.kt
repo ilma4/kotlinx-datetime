@@ -15,7 +15,7 @@ import kotlin.test.assertEquals
 
 class ConvertersTest {
     class instant {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun instant(data: FuzzedDataProvider) {
             fun test(seconds: Long, nanosecond: Int) {
                 val ktInstant = Instant.fromEpochSeconds(seconds, nanosecond.toLong())
@@ -35,7 +35,7 @@ class ConvertersTest {
     }
 
     class localDateTime {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun localDateTime(data: FuzzedDataProvider) {
             fun test(ktDateTime: LocalDateTime) {
                 val jtDateTime = with(ktDateTime) {
@@ -62,7 +62,7 @@ class ConvertersTest {
     }
 
     class localTime {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun localTime(data: FuzzedDataProvider) {
             fun test(ktTime: LocalTime) {
                 val jtTime =
@@ -80,7 +80,7 @@ class ConvertersTest {
     }
 
     class localDate {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun localDate(data: FuzzedDataProvider) {
             fun test(ktDate: LocalDate) {
                 val jtDate = with(ktDate) { java.time.LocalDate.of(year, month, dayOfMonth) }
@@ -97,7 +97,7 @@ class ConvertersTest {
     }
 
     class datePeriod {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun datePeriod(data: FuzzedDataProvider) {
 
             fun assertJtPeriodNormalizedEquals(a: Period, b: Period) {
@@ -125,7 +125,7 @@ class ConvertersTest {
     }
 
     class localDateTimeSetTime {
-        @FuzzTest
+        @FuzzTest(maxDuration = "2h")
         fun test(data: FuzzedDataProvider) = with(data) {
             val ktDt = consumeDateTime()
             val jvDt = ktDt.copyj()
