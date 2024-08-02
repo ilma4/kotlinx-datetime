@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 import java.time.Period
 import java.time.temporal.ChronoUnit
 import kotlin.test.assertEquals
-import kotlin.time.toJavaDuration
 import kotlin.time.toKotlinDuration
 
 class DiffTest {
@@ -25,7 +24,7 @@ class DiffTest {
             val b = data.consumeDate(-mod, mod)
 
             val kotlinRes = runCatching<DatePeriod> { a.periodUntil(b) }
-            val javaRes = runCatching<Period> { a.toJavaLocalDate().until(b.toJavaLocalDate()) }
+            val javaRes = runCatching<Period> { a.copyj().until(b.copyj()) }
 
             assertEquals(kotlinRes.isSuccess, javaRes.isSuccess)
 
@@ -72,8 +71,8 @@ class DiffTest {
             val kfirst = consumeInstant()
             val ksecond = consumeInstant()
 
-            val jfirst = kfirst.toJavaInstant()
-            val jsecond = ksecond.toJavaInstant()
+            val jfirst = kfirst.copyj()
+            val jsecond = ksecond.copyj()
 
             compareTest(
                 createKotlin = { kfirst.until(ksecond, DateTimeUnit.SECOND) },
@@ -133,7 +132,7 @@ class DiffTest {
             compareTest(
                 createKotlin = { second - first },
                 createJava = { java.time.Duration.between(first.copyj(), second.copyj()) },
-                kotlinToJava = { it.toJavaDuration() },
+                kotlinToJava = { it.copyj() },
                 javaToKotlin = { it.toKotlinDuration() }
             )
         }

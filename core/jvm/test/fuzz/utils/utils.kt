@@ -29,7 +29,17 @@ inline fun <K_TYPE, J_TYPE> compareTest(
 
         assertEquals(kotlinVal, kotlinFromJava)
         assertEquals(javaVal, javaFromKotlin)
-        if (!disableOkPrintln) println("all ok")
+        if (!disableOkPrintln) {
+            println("all ok")
+            System.out.flush()
+        }
         Unit
     }
+}
+
+
+inline fun <T> tryOrNull(block: () -> T): T? = try {
+    block()
+} catch (t: Throwable) {
+    null
 }
