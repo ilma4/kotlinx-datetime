@@ -10,18 +10,75 @@ import com.code_intelligence.jazzer.junit.FuzzTest
 import fuzz.utils.compareTest
 import kotlinx.datetime.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
 import java.time.Period
 import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
 import kotlin.time.toKotlinDuration
 
 class DiffTest {
     class datePeriodDiff {
-        @FuzzTest(maxDuration = "2h")
+        @Timeout(value = 1, unit = TimeUnit.SECONDS)
+        @FuzzTest(/*maxDuration = "2h"*/)
         fun diff(data: FuzzedDataProvider) {
             val mod = 0 //5000
             val a = data.consumeDate(-mod, mod)
             val b = data.consumeDate(-mod, mod)
+
+            val kotlinRes = runCatching<DatePeriod> { a.periodUntil(b) }
+            val javaRes = runCatching<Period> { a.copyj().until(b.copyj()) }
+
+            assertEquals(kotlinRes.isSuccess, javaRes.isSuccess)
+
+            if (kotlinRes.isFailure || javaRes.isFailure) return
+
+            val kotlinVal = kotlinRes.getOrThrow()
+            val javaVal = javaRes.getOrThrow()
+
+            val javaFromKotlin = kotlinVal.toJavaPeriod()
+            val kotlinFromJava = javaVal.toKotlinDatePeriod()
+
+            assertEquals(kotlinVal, kotlinFromJava)
+            assertEquals(javaVal, javaFromKotlin)
+        }
+    }
+
+    class datePeriodDiffNonNegative {
+        @FuzzTest(maxDuration = "2h")
+        fun diff(data: FuzzedDataProvider) {
+            val aa = data.consumeDate()
+            val bb = data.consumeDate()
+
+            val a = if (aa < bb) aa else bb
+            val b = if (aa < bb) bb else aa
+
+            val kotlinRes = runCatching<DatePeriod> { a.periodUntil(b) }
+            val javaRes = runCatching<Period> { a.copyj().until(b.copyj()) }
+
+            assertEquals(kotlinRes.isSuccess, javaRes.isSuccess)
+
+            if (kotlinRes.isFailure || javaRes.isFailure) return
+
+            val kotlinVal = kotlinRes.getOrThrow()
+            val javaVal = javaRes.getOrThrow()
+
+            val javaFromKotlin = kotlinVal.toJavaPeriod()
+            val kotlinFromJava = javaVal.toKotlinDatePeriod()
+
+            assertEquals(kotlinVal, kotlinFromJava)
+            assertEquals(javaVal, javaFromKotlin)
+        }
+    }
+
+    class datePeriodDiffNonPositive {
+        @FuzzTest(maxDuration = "2h")
+        fun diff(data: FuzzedDataProvider) {
+            val aa = data.consumeDate()
+            val bb = data.consumeDate()
+
+            val a = if (aa > bb) aa else bb
+            val b = if (aa > bb) bb else aa
 
             val kotlinRes = runCatching<DatePeriod> { a.periodUntil(b) }
             val javaRes = runCatching<Period> { a.copyj().until(b.copyj()) }

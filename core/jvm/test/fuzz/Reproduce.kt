@@ -8,6 +8,9 @@ package fuzz
 import kotlinx.datetime.*
 import org.junit.jupiter.api.assertDoesNotThrow
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.time.*
 
 //import org.junit.jupiter.api.Test
 
@@ -36,7 +39,6 @@ class Reproduce {
 //        val jv = assertFails { java.time.Duration.parse(s) }
         java.time.Period.parse(s)
     }
-
 
     @Test
     fun until() {
@@ -94,5 +96,78 @@ class Reproduce {
         val period = kotlinx.datetime.DatePeriod(months = -1, days = -29)
         println(firstDate + period)
         println(firstDate + period - period)
+    }
+
+    @Test
+    fun durationInfiniteOfDays() {
+        val jv = java.time.Duration.ofDays(1_000_000_000_000L)
+        val kt = jv.toKotlinDuration()
+        assertEquals(Duration.INFINITE, kt)
+        assertNotEquals(kt.toJavaDuration(), jv)
+
+        println("jv: $jv")
+        println("kt: $kt")
+        println("kt.toJavaDuration(): ${kt.toJavaDuration()}")
+    }
+
+    @Test
+    fun ofSecondsMinToInf(){
+        var fromExcl = 0L
+        var toIncl = Long.MAX_VALUE
+        while(toIncl - fromExcl > 1L){
+            val m = (toIncl + fromExcl) / 2L
+            val toKotlinDuration = java.time.Duration.ofSeconds(m).toKotlinDuration()
+            if (toKotlinDuration == Duration.INFINITE){
+                toIncl = m
+            } else {
+                fromExcl = m
+            }
+        }
+        println(fromExcl)
+    }
+
+    @Test
+    fun aaa(){
+        val a = java.time.Duration.ofSeconds(Long.MAX_VALUE / 2)
+        val b = (Long.MAX_VALUE / 2).toDuration(DurationUnit.SECONDS)
+
+        println(a)
+        println(b.toString())
+        println(b.toJavaDuration())
+    }
+
+    @Test
+    fun bbb(){
+        val maxSecond = 31556889864403199L
+        java.time.Instant.ofEpochSecond(maxSecond)
+        Instant.fromEpochSeconds(maxSecond)
+    }
+
+    @Test
+    fun jvOfSecondsMinToInf(){
+        var fromExcl = 0L
+        var toIncl = Long.MAX_VALUE
+        while(toIncl - fromExcl > 1L){
+            val m = (toIncl + fromExcl) / 2L
+            val jvDuration = java.time.Duration.ofSeconds(m)
+            if (jvDuration.seconds == Long.MIN_VALUE){
+                toIncl = m
+            } else {
+                fromExcl = m
+            }
+        }
+        println(fromExcl)
+    }
+
+    @Test
+    fun durationInfiniteOfSeconds() {
+        val jv = java.time.Duration.ofDays(1_000_000_000_000L)
+        val kt = jv.toKotlinDuration()
+        assertEquals(Duration.INFINITE, kt)
+        assertNotEquals(kt.toJavaDuration(), jv)
+
+        println("jv: $jv")
+        println("kt: $kt")
+        println("kt.toJavaDuration(): ${kt.toJavaDuration()}")
     }
 }
