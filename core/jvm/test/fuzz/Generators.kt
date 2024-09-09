@@ -7,10 +7,13 @@ package fuzz
 
 import com.code_intelligence.jazzer.api.FuzzedDataProvider
 import kotlinx.datetime.*
+import kotlinx.datetime.format.DateTimeFormatBuilder
+import kotlinx.datetime.format.LocalDateTimeFormat
 import java.time.ZoneId
 import kotlin.time.Duration
 
 
+@OptIn(ExperimentalStdlibApi::class)
 fun FuzzedDataProvider.consumeDate(yearFrom: Int = -20000, yearTo: Int = 20000): LocalDate {
     val year = consumeInt(yearFrom, yearTo)
     val month = pickValue(Month.entries)
@@ -65,3 +68,30 @@ fun Instant.copyj(): java.time.Instant =
     java.time.Instant.ofEpochSecond(epochSeconds, nanosecondsOfSecond.toLong())
 
 fun Duration.copyj(): java.time.Duration = java.time.Duration.ofSeconds(inWholeSeconds)
+
+private typealias FormatterOp = DateTimeFormatBuilder.WithDateTime.() -> Unit
+
+//private val ops = listOf<FormatterOp>(
+//    { amPmHour() },
+//    { dayOfMonth() },
+//    { monthNumber() },
+//    { year() },
+//    { second() },
+//)
+
+
+internal fun FuzzedDataProvider.consumeFormat(): LocalDateTimeFormat {
+    val opsNum = consumeInt(0, 20)
+    val ops = List(opsNum) { consumeInt(0, 4) }
+    return LocalDateTimeFormat.build {
+        ops.forEach {
+            when (it) {
+                0 -> amPmHour()
+                1 -> dayOfMonth()
+                2 -> monthNumber()
+                3 -> year()
+                4 -> second()
+            }
+        }
+    }
+}

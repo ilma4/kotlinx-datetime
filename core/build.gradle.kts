@@ -37,55 +37,55 @@ java {
 kotlin {
     explicitApi()
 
-    /*    infra {
-            common("tzfile") {
-                // Tiers are in accordance with <https://kotlinlang.org/docs/native-target-support.html>
-                common("tzdbOnFilesystem") {
-                    common("linux") {
+    infra {
+        common("tzfile") {
+            // Tiers are in accordance with <https://kotlinlang.org/docs/native-target-support.html>
+            common("tzdbOnFilesystem") {
+                common("linux") {
+                    // Tier 1
+                    target("linuxX64")
+                    // Tier 2
+                    target("linuxArm64")
+                    // Tier 4 (deprecated, but still in demand)
+                    target("linuxArm32Hfp")
+                }
+                common("darwin") {
+                    common("darwinDevices") {
                         // Tier 1
-                        target("linuxX64")
+                        target("macosX64")
+                        target("macosArm64")
                         // Tier 2
-                        target("linuxArm64")
-                        // Tier 4 (deprecated, but still in demand)
-                        target("linuxArm32Hfp")
+                        target("watchosX64")
+                        target("watchosArm32")
+                        target("watchosArm64")
+                        target("tvosX64")
+                        target("tvosArm64")
+                        target("iosArm64")
+                        // Tier 3
+                        target("watchosDeviceArm64")
                     }
-                    common("darwin") {
-                        common("darwinDevices") {
-                            // Tier 1
-                            target("macosX64")
-                            target("macosArm64")
-                            // Tier 2
-                            target("watchosX64")
-                            target("watchosArm32")
-                            target("watchosArm64")
-                            target("tvosX64")
-                            target("tvosArm64")
-                            target("iosArm64")
-                            // Tier 3
-                            target("watchosDeviceArm64")
-                        }
-                        common("darwinSimulator") {
-                            // Tier 1
-                            target("iosSimulatorArm64")
-                            target("iosX64")
-                            // Tier 2
-                            target("watchosSimulatorArm64")
-                            target("tvosSimulatorArm64")
-                        }
+                    common("darwinSimulator") {
+                        // Tier 1
+                        target("iosSimulatorArm64")
+                        target("iosX64")
+                        // Tier 2
+                        target("watchosSimulatorArm64")
+                        target("tvosSimulatorArm64")
                     }
                 }
-                common("androidNative") {
-                    target("androidNativeArm32")
-                    target("androidNativeArm64")
-                    target("androidNativeX86")
-                    target("androidNativeX64")
-                }
             }
-            // Tier 3
-            common("windows") {
-                target("mingwX64")
+            common("androidNative") {
+                target("androidNativeArm32")
+                target("androidNativeArm64")
+                target("androidNativeX86")
+                target("androidNativeX64")
             }
-        }*/
+        }
+        // Tier 3
+        common("windows") {
+            target("mingwX64")
+        }
+    }
 
     jvm {
         attributes {
@@ -97,39 +97,6 @@ kotlin {
 
     }
 
-/*
-    js {
-        nodejs {
-            testTask {
-                useMocha {
-                    timeout = "30s"
-                }
-            }
-        }
-        compilations.all {
-            kotlinOptions {
-                sourceMap = true
-                moduleKind = "umd"
-                metaInfo = true
-            }
-        }
-//        compilations["main"].apply {
-//            kotlinOptions {
-//                outputFile = "kotlinx-datetime-tmp.js"
-//            }
-//        }
-    }
-
-    wasmJs {
-        nodejs {
-            testTask {
-                useMocha {
-                    timeout = "30s"
-                }
-            }
-        }
-    }
-*/
 
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
@@ -193,40 +160,10 @@ kotlin {
             dependencies {
                 implementation("com.code-intelligence:jazzer-api:0.0.0-dev")
                 implementation("com.code-intelligence:jazzer-junit:0.0.0-dev")
+                implementation("com.code-intelligence:jazzer:0.0.0-dev")
                 implementation("org.junit.jupiter:junit-jupiter:5.9.2")
 //                implementation(kotlin("reflect"))
             }
-        }
-
-/*        val commonJsMain by creating {
-            dependsOn(commonMain.get())
-            dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
-                implementation(npm("@js-joda/core", "3.2.0"))
-            }
-        }
-
-        val commonJsTest by creating {
-            dependsOn(commonTest.get())
-            dependencies {
-                implementation(npm("@js-joda/timezone", "2.3.0"))
-            }
-        }
-
-        val jsMain by getting {
-            dependsOn(commonJsMain)
-        }
-
-        val jsTest by getting {
-            dependsOn(commonJsTest)
-        }
-
-        val wasmJsMain by getting {
-            dependsOn(commonJsMain)
-        }
-
-        val wasmJsTest by getting {
-            dependsOn(commonJsTest)
         }
 
         val nativeMain by getting {
@@ -243,7 +180,7 @@ kotlin {
         }
 
         val darwinTest by getting {
-        }*/
+        }
     }
 }
 
@@ -251,7 +188,9 @@ tasks {
     val jvmTest by existing(Test::class) {
         useJUnitPlatform()
         testLogging.showStandardStreams = true
-        maxHeapSize = "4096m"
+        maxHeapSize = "3686m"
+//        maxHeapSize = "4096m"
+//        maxHeapSize = "8192m"
         // maxHeapSize = "1024m"
     }
 

@@ -14,135 +14,129 @@ import java.time.Period
 import kotlin.test.assertEquals
 
 class ConvertersTest {
-    class instant {
-        @FuzzTest(maxDuration = "2h")
-        fun instant(data: FuzzedDataProvider) {
-            fun test(seconds: Long, nanosecond: Int) {
-                val ktInstant = Instant.fromEpochSeconds(seconds, nanosecond.toLong())
-                val jtInstant = java.time.Instant.ofEpochSecond(seconds, nanosecond.toLong())
+    @FuzzTest(maxDuration = "2h")
+    fun instant(data: FuzzedDataProvider) {
+        fun test(seconds: Long, nanosecond: Int) {
+            val ktInstant = Instant.fromEpochSeconds(seconds, nanosecond.toLong())
+            val jtInstant = java.time.Instant.ofEpochSecond(seconds, nanosecond.toLong())
 
-                assertEquals(ktInstant, jtInstant.toKotlinInstant())
-                assertEquals(jtInstant, ktInstant.toJavaInstant())
+            assertEquals(ktInstant, jtInstant.toKotlinInstant())
+            assertEquals(jtInstant, ktInstant.toJavaInstant())
 
-                assertEquals(ktInstant, jtInstant.toString().toInstant())
-                assertEquals(jtInstant, ktInstant.toString().let(java.time.Instant::parse))
-            }
-
-            val seconds = data.consumeLong(-1_000_000_000_000, 1_000_000_000_000)
-            val nanos = data.consumeInt()
-            test(seconds, nanos)
+            assertEquals(ktInstant, jtInstant.toString().toInstant())
+            assertEquals(jtInstant, ktInstant.toString().let(java.time.Instant::parse))
         }
+
+        val seconds = data.consumeLong(-1_000_000_000_000, 1_000_000_000_000)
+        val nanos = data.consumeInt()
+        test(seconds, nanos)
     }
 
-    class localDateTime {
-        @FuzzTest(maxDuration = "2h")
-        fun localDateTime(data: FuzzedDataProvider) {
-            fun test(ktDateTime: LocalDateTime) {
-                val jtDateTime = with(ktDateTime) {
-                    java.time.LocalDateTime.of(
-                        year,
-                        month,
-                        dayOfMonth,
-                        hour,
-                        minute,
-                        second,
-                        nanosecond
-                    )
-                }
-
-                assertEquals(ktDateTime, jtDateTime.toKotlinLocalDateTime())
-                assertEquals(jtDateTime, ktDateTime.toJavaLocalDateTime())
-
-                assertEquals(ktDateTime, jtDateTime.toString().toLocalDateTime())
-                assertEquals(jtDateTime, ktDateTime.toString().let(java.time.LocalDateTime::parse))
+    @FuzzTest(maxDuration = "2h")
+    fun localDateTime(data: FuzzedDataProvider) {
+        fun test(ktDateTime: LocalDateTime) {
+            val jtDateTime = with(ktDateTime) {
+                java.time.LocalDateTime.of(
+                    year,
+                    month,
+                    dayOfMonth,
+                    hour,
+                    minute,
+                    second,
+                    nanosecond
+                )
             }
 
-            test(data.consumeDateTime())
+            assertEquals(ktDateTime, jtDateTime.toKotlinLocalDateTime())
+            assertEquals(jtDateTime, ktDateTime.toJavaLocalDateTime())
+
+            assertEquals(ktDateTime, jtDateTime.toString().toLocalDateTime())
+            assertEquals(jtDateTime, ktDateTime.toString().let(java.time.LocalDateTime::parse))
         }
+
+        test(data.consumeDateTime())
     }
 
-    class localTime {
-        @FuzzTest(maxDuration = "2h")
-        fun localTime(data: FuzzedDataProvider) {
-            fun test(ktTime: LocalTime) {
-                val jtTime =
-                    with(ktTime) { java.time.LocalTime.of(hour, minute, second, nanosecond) }
+    @FuzzTest(maxDuration = "2h")
+    fun localTime(data: FuzzedDataProvider) {
+        fun test(ktTime: LocalTime) {
+            val jtTime =
+                with(ktTime) { java.time.LocalTime.of(hour, minute, second, nanosecond) }
 
-                assertEquals(ktTime, jtTime.toKotlinLocalTime())
-                assertEquals(jtTime, ktTime.toJavaLocalTime())
+            assertEquals(ktTime, jtTime.toKotlinLocalTime())
+            assertEquals(jtTime, ktTime.toJavaLocalTime())
 
-                assertEquals(ktTime, jtTime.toString().toLocalTime())
-                assertEquals(jtTime, ktTime.toString().let(java.time.LocalTime::parse))
-            }
-
-            test(data.consumeTime())
+            assertEquals(ktTime, jtTime.toString().toLocalTime())
+            assertEquals(jtTime, ktTime.toString().let(java.time.LocalTime::parse))
         }
+
+        test(data.consumeTime())
     }
 
-    class localDate {
-        @FuzzTest(maxDuration = "2h")
-        fun localDate(data: FuzzedDataProvider) {
-            fun test(ktDate: LocalDate) {
-                val jtDate = with(ktDate) { java.time.LocalDate.of(year, month, dayOfMonth) }
+    @FuzzTest(maxDuration = "2h")
+    fun localDate(data: FuzzedDataProvider) {
+        fun test(ktDate: LocalDate) {
+            val jtDate = with(ktDate) { java.time.LocalDate.of(year, month, dayOfMonth) }
 
-                assertEquals(ktDate, jtDate.toKotlinLocalDate())
-                assertEquals(jtDate, ktDate.toJavaLocalDate())
+            assertEquals(ktDate, jtDate.toKotlinLocalDate())
+            assertEquals(jtDate, ktDate.toJavaLocalDate())
 
-                assertEquals(ktDate, jtDate.toString().toLocalDate())
-                assertEquals(jtDate, ktDate.toString().let(java.time.LocalDate::parse))
-            }
-
-            test(data.consumeDate())
+            assertEquals(ktDate, jtDate.toString().toLocalDate())
+            assertEquals(jtDate, ktDate.toString().let(java.time.LocalDate::parse))
         }
+
+        test(data.consumeDate())
     }
 
-    class datePeriod {
-        @FuzzTest(maxDuration = "2h")
-        fun datePeriod(data: FuzzedDataProvider) {
+    @FuzzTest(maxDuration = "2h")
+    fun datePeriod(data: FuzzedDataProvider) {
 
-            fun assertJtPeriodNormalizedEquals(a: Period, b: Period) {
-                assertEquals(a.days, b.days)
-                assertEquals(a.months + a.years * 12, b.months + b.years * 12)
-            }
-
-            fun test(years: Int, months: Int, days: Int) {
-                val ktPeriod = DatePeriod(years, months, days)
-                val jtPeriod = Period.of(years, months, days)
-
-                assertEquals(ktPeriod, jtPeriod.toKotlinDatePeriod())
-                assertJtPeriodNormalizedEquals(jtPeriod, ktPeriod.toJavaPeriod())
-
-                assertEquals(ktPeriod, jtPeriod.toString().let(DatePeriod::parse))
-                assertJtPeriodNormalizedEquals(jtPeriod, ktPeriod.toString().let(Period::parse))
-            }
-
-            test(
-                data.consumeInt(-1000, 1000),
-                data.consumeInt(-1000, 1000),
-                data.consumeInt(-1000, 1000)
-            )
+        fun assertJtPeriodNormalizedEquals(a: Period, b: Period) {
+            assertEquals(a.days, b.days)
+            assertEquals(a.months + a.years * 12, b.months + b.years * 12)
         }
+
+        fun test(years: Int, months: Int, days: Int) {
+            val ktPeriod = DatePeriod(years, months, days)
+            val jtPeriod = Period.of(years, months, days)
+
+            assertEquals(ktPeriod, jtPeriod.toKotlinDatePeriod())
+            assertJtPeriodNormalizedEquals(jtPeriod, ktPeriod.toJavaPeriod())
+
+            assertEquals(ktPeriod, jtPeriod.toString().let(DatePeriod::parse))
+            assertJtPeriodNormalizedEquals(jtPeriod, ktPeriod.toString().let(Period::parse))
+        }
+
+        test(
+            data.consumeInt(-1000, 1000),
+            data.consumeInt(-1000, 1000),
+            data.consumeInt(-1000, 1000)
+        )
     }
 
-    class localDateTimeSetTime {
-        @FuzzTest(maxDuration = "2h")
-        fun test(data: FuzzedDataProvider) = with(data) {
-            val ktDt = consumeDateTime()
-            val jvDt = ktDt.copyj()
+    @FuzzTest(maxDuration = "2h")
+    fun dateTime(data: FuzzedDataProvider) = with(data) {
+        val ktDt = consumeDateTime()
+        val jvDt = ktDt.copyj()
 
-            val ktTime = consumeTime()
-            val jvTime = ktTime.copyj()
+        val ktTime = consumeTime()
+        val jvTime = ktTime.copyj()
 
-            assertEquals(
-                ktDt.date.atTime(ktTime),
-                jvDt.toLocalDate().atTime(jvTime).toKotlinLocalDateTime()
-            )
+        assertEquals(
+            ktDt.date.atTime(ktTime),
+            jvDt.toLocalDate().atTime(jvTime).toKotlinLocalDateTime()
+        )
 
-            assertEquals(
-                ktDt.date.atTime(ktTime).copyj(),
-                jvDt.toLocalDate().atTime(jvTime)
-            )
-        }
+        assertEquals(
+            ktDt.date.atTime(ktTime).copyj(),
+            jvDt.toLocalDate().atTime(jvTime)
+        )
     }
+
+    @FuzzTest(maxDuration = "2h")
+    fun utcOffset(data: FuzzedDataProvider) = with(data) {
+    }
+
+
 }
 

@@ -38,6 +38,17 @@ inline fun <K_TYPE, J_TYPE> compareTest(
 }
 
 
+inline fun <T> compareTest(
+    firstBlock: () -> T,
+    secondBlock: () -> T,
+) {
+    val firstRes = runCatching { firstBlock() }
+    val secondRes = runCatching { secondBlock() }
+    assertEquals(firstRes.isSuccess, secondRes.isSuccess)
+    assertEquals(firstRes.getOrNull(), secondRes.getOrNull())
+}
+
+
 inline fun <T> tryOrNull(block: () -> T): T? = try {
     block()
 } catch (t: Throwable) {

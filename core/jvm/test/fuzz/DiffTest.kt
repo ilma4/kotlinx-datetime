@@ -86,10 +86,8 @@ class DiffTest {
         val jsecond = ksecond.copyj()
 
         compareTest(
-            createKotlin = { kfirst.until(ksecond, DateTimeUnit.SECOND) },
-            createJava = { jfirst.until(jsecond, ChronoUnit.SECONDS) },
-            kotlinToJava = { it },
-            javaToKotlin = { it }
+            firstBlock = { kfirst.until(ksecond, DateTimeUnit.SECOND) },
+            secondBlock = { jfirst.until(jsecond, ChronoUnit.SECONDS) },
         )
     }
 
@@ -106,12 +104,8 @@ class DiffTest {
 
 
         compareTest(
-            createKotlin = { kfirst.until(ksecond, DateTimeUnit.SECOND, ktz) },
-            createJava = {
-                jfirst.until(jsecond, ChronoUnit.SECONDS)
-            },
-            kotlinToJava = { it },
-            javaToKotlin = { it }
+            firstBlock = { kfirst.until(ksecond, DateTimeUnit.SECOND, ktz) },
+            secondBlock = { jfirst.until(jsecond, ChronoUnit.SECONDS) },
         )
     }
 
@@ -120,10 +114,8 @@ class DiffTest {
         val d = consumeDateTime()
         val tz = consumeTimeZone()
         compareTest(
-            createKotlin = { d },
-            createJava = { d.toInstant(tz).toLocalDateTime(tz) },
-            javaToKotlin = { it },
-            kotlinToJava = { it }
+            firstBlock = { d },
+            secondBlock = { d.toInstant(tz).toLocalDateTime(tz) },
         )
     }
 
