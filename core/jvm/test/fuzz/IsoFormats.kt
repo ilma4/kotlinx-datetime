@@ -13,7 +13,7 @@ import kotlinx.datetime.LocalDateTime
 
 class IsoFormats {
 
-    @FuzzTest
+    @FuzzTest(maxDuration = "2h")
     fun localDate(data: FuzzedDataProvider): Unit = with(data) {
         val s = data.consumeString(1000)
         compareTest(
@@ -22,7 +22,7 @@ class IsoFormats {
         )
     }
 
-    @FuzzTest
+    @FuzzTest(maxDuration = "2h")
     fun localDateTime(data: FuzzedDataProvider): Unit = with(data) {
         val s = data.consumeString(1000)
         compareTest(

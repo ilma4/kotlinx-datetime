@@ -9,20 +9,17 @@ import com.code_intelligence.jazzer.api.FuzzedDataProvider
 import com.code_intelligence.jazzer.junit.FuzzTest
 import kotlinx.datetime.DateTimeFormatException
 import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.DayOfWeekNames
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.assertDoesNotThrow
 
 @Suppress("UnusedEquals")
-class ParseFromStringCheckAboba {
+class ParseFromStringCheckExceptions {
 
     private inline fun isFine(block: () -> Unit) = try {
         block()
     } catch (_: DateTimeFormatException) {
     }
 
-    @FuzzTest
+    @FuzzTest(maxDuration = "2h")
     fun onlyEquals(data: FuzzedDataProvider): Unit = with(data) {
         val a = data.consumeInstant()
         val b = data.consumeInstant()
@@ -30,19 +27,19 @@ class ParseFromStringCheckAboba {
     }
 
 
-    @FuzzTest
+    @FuzzTest(maxDuration = "2h")
     fun localDateIso(data: FuzzedDataProvider): Unit = with(data) {
         val s = consumeString(100)
         isFine { kotlinx.datetime.LocalDate.Formats.ISO.parse(s) }
     }
 
-    @FuzzTest
+    @FuzzTest(maxDuration = "2h")
     fun localDateTime(data: FuzzedDataProvider): Unit = with(data) {
         val s = consumeString(1000)
         isFine { kotlinx.datetime.LocalDateTime.parse(s) }
     }
 
-    @FuzzTest
+    @FuzzTest(maxDuration = "2h")
     fun localDateMyFormat(data: FuzzedDataProvider): Unit = with(data) {
         val format = kotlinx.datetime.LocalDate.Format {
             dayOfMonth()
@@ -53,14 +50,14 @@ class ParseFromStringCheckAboba {
         isFine { format.parse(s) }
     }
 
-    @FuzzTest
+    @FuzzTest(maxDuration = "2h")
     fun localDateIsoBasic(data: FuzzedDataProvider): Unit = with(data) {
         val s = consumeString(1000)
         val format = kotlinx.datetime.LocalDate.Formats.ISO_BASIC
         isFine { format.parse(s) }
     }
 
-    @FuzzTest(maxDuration = "10m")
+    @FuzzTest(maxDuration = "2h")
     fun instant(data: FuzzedDataProvider): Unit = with(data) {
         isFine { Instant.parse(consumeString(100)) }
     }

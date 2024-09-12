@@ -84,7 +84,7 @@ class ParseFromStringCompare {
         )
     }
 
-    @FuzzTest(maxDuration = "10m")
+    @FuzzTest(maxDuration = "2h")
     fun instant(data: FuzzedDataProvider) {
         val s = data.consumeString(100)
         compareTest(

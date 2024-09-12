@@ -28,7 +28,7 @@ class DiffTest {
         }
     }
 
-    @FuzzTest(/*maxDuration = "2h"*/)
+    @FuzzTest(maxDuration = "2h")
     fun diffDatePeriod(data: FuzzedDataProvider) {
         val mod = 0 //5000
         val a = data.consumeDate(-mod, mod)
@@ -77,7 +77,7 @@ class DiffTest {
     }
 
 
-    @FuzzTest(maxDuration = "1m")
+    @FuzzTest(maxDuration = "2h")
     fun diffInstant(data: FuzzedDataProvider) = with(data) {
         val kfirst = consumeInstant()
         val ksecond = consumeInstant()
